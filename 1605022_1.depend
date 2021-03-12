@@ -1,9 +1,10 @@
 # depslib dependency file v1.0
-1615507793 source:f:\graphics offlines\offline 1\1605022_1\main.cpp
-	<windows.h>
-	<GLUT/glut.h>
-	<GL/glut.h>
+1615542693 source:f:\graphics offlines\offline 1\1605022_1\main.cpp
+	<stdio.h>
 	<stdlib.h>
+	<math.h>
+	<windows.h>
+	<GL/glut.h>
 
 1472499032 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
 	<windows.h>
