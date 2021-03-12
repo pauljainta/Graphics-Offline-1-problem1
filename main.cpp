@@ -14,6 +14,9 @@ int drawgrid;
 int drawaxes;
 double angle;
 
+double ang=1.0;
+
+
 struct point
 {
 	double x,y,z;
@@ -22,11 +25,94 @@ struct point
 
 struct point pos,u,l,r;
 
-//pos.x=100;
-//pos.y=100;
-//pos.z=0;
 
-//l->x=(-1)/sqrt(2);
+
+struct point cross_gun(struct point p1,struct point p2)
+{
+    struct point cross_P;
+
+    cross_P.x = p1.y * p2.z - p1.z * p2.y;
+    cross_P.y = p1.z * p2.x - p1.x * p2.z;
+    cross_P.z = p1.x * p2.y - p1.y * p2.x;
+
+    return cross_P;
+
+
+}
+
+
+double dotGun(struct point A, struct point B)
+{
+
+    double product = 0;
+    product = product + (A.x*B.x)+(A.y*B.y)+(A.z*B.z);
+    return product;
+}
+
+void RotateLR(int side)
+{
+     double ldot=dotGun(u,l);
+     struct point lcross=cross_gun(u,l);
+
+     double rdot=dotGun(u,r);
+     struct point rcross=cross_gun(u,r);
+
+    l.x=l.x*cos(side*ang)+lcross.x*sin(side*ang)+(u.x)*ldot*(1-cos(side*ang));
+    l.y=l.y*cos(side*ang)+lcross.y*sin(side*ang)+(u.y)*ldot*(1-cos(side*ang));
+    l.z=l.z*cos(side*ang)+lcross.z*sin(side*ang)+(u.z)*ldot*(1-cos(side*ang));
+
+    r.x=r.x*cos(side*ang)+rcross.x*sin(side*ang)+(u.x)*rdot*(1-cos(side*ang));
+    r.y=r.y*cos(side*ang)+rcross.y*sin(side*ang)+(u.y)*rdot*(1-cos(side*ang));
+    r.z=r.z*cos(side*ang)+rcross.z*sin(side*ang)+(u.z)*rdot*(1-cos(side*ang));
+
+
+
+
+}
+
+
+void RotateLU(int side)
+{
+     double ldot=dotGun(r,l);
+     struct point lcross=cross_gun(r,l);
+
+     double udot=dotGun(r,u);
+     struct point ucross=cross_gun(r,u);
+
+    l.x=l.x*cos(side*ang)+lcross.x*sin(side*ang)+(r.x)*ldot*(1-cos(side*ang));
+    l.y=l.y*cos(side*ang)+lcross.y*sin(side*ang)+(r.y)*ldot*(1-cos(side*ang));
+    l.z=l.z*cos(side*ang)+lcross.z*sin(side*ang)+(r.z)*ldot*(1-cos(side*ang));
+
+    u.x=u.x*cos(side*ang)+ucross.x*sin(side*ang)+(r.x)*udot*(1-cos(side*ang));
+    u.y=u.y*cos(side*ang)+ucross.y*sin(side*ang)+(r.y)*udot*(1-cos(side*ang));
+    u.z=u.z*cos(side*ang)+ucross.z*sin(side*ang)+(r.z)*udot*(1-cos(side*ang));
+
+
+
+
+}
+
+
+void RotateRU(int side)
+{
+     double rdot=dotGun(l,r);
+     struct point rcross=cross_gun(l,r);
+
+     double udot=dotGun(l,u);
+     struct point ucross=cross_gun(l,u);
+
+    r.x=r.x*cos(side*ang)+rcross.x*sin(side*ang)+(l.x)*rdot*(1-cos(side*ang));
+    r.y=r.y*cos(side*ang)+rcross.y*sin(side*ang)+(l.y)*rdot*(1-cos(side*ang));
+    r.z=r.z*cos(side*ang)+rcross.z*sin(side*ang)+(l.z)*rdot*(1-cos(side*ang));
+
+    u.x=u.x*cos(side*ang)+ucross.x*sin(side*ang)+(l.x)*udot*(1-cos(side*ang));
+    u.y=u.y*cos(side*ang)+ucross.y*sin(side*ang)+(l.y)*udot*(1-cos(side*ang));
+    u.z=u.z*cos(side*ang)+ucross.z*sin(side*ang)+(l.z)*udot*(1-cos(side*ang));
+
+
+
+
+}
 
 
 
@@ -210,7 +296,22 @@ void keyboardListener(unsigned char key, int x,int y){
 	switch(key){
 
 		case '1':
-			drawgrid=1-drawgrid;
+		    RotateLR(1);
+            break;
+        case '2':
+            RotateLR(-1);
+			break;
+        case '3':
+            RotateLU(1);
+            break;
+		case '4':
+		    RotateLU(-1);
+			break;
+		case '5':
+		    RotateRU(1);
+			break;
+		case '6':
+		    RotateRU(-1);
 			break;
 
 		default:
