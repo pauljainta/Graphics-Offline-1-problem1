@@ -13,8 +13,9 @@ double cameraAngle;
 int drawgrid;
 int drawaxes;
 double angle;
+double wall_side;
+double wall_y;
 
-double ang=1.0;
 
 
 struct point
@@ -57,14 +58,13 @@ void RotateLR(int side)
      double rdot=dotGun(u,r);
      struct point rcross=cross_gun(u,r);
 
-    l.x=l.x*cos(side*ang)+lcross.x*sin(side*ang)+(u.x)*ldot*(1-cos(side*ang));
-    l.y=l.y*cos(side*ang)+lcross.y*sin(side*ang)+(u.y)*ldot*(1-cos(side*ang));
-    l.z=l.z*cos(side*ang)+lcross.z*sin(side*ang)+(u.z)*ldot*(1-cos(side*ang));
+    l.x=l.x*cos(side*angle)+lcross.x*sin(side*angle)+(u.x)*ldot*(1-cos(side*angle));
+    l.y=l.y*cos(side*angle)+lcross.y*sin(side*angle)+(u.y)*ldot*(1-cos(side*angle));
+    l.z=l.z*cos(side*angle)+lcross.z*sin(side*angle)+(u.z)*ldot*(1-cos(side*angle));
 
-    r.x=r.x*cos(side*ang)+rcross.x*sin(side*ang)+(u.x)*rdot*(1-cos(side*ang));
-    r.y=r.y*cos(side*ang)+rcross.y*sin(side*ang)+(u.y)*rdot*(1-cos(side*ang));
-    r.z=r.z*cos(side*ang)+rcross.z*sin(side*ang)+(u.z)*rdot*(1-cos(side*ang));
-
+    r.x=r.x*cos(side*angle)+rcross.x*sin(side*angle)+(u.x)*rdot*(1-cos(side*angle));
+    r.y=r.y*cos(side*angle)+rcross.y*sin(side*angle)+(u.y)*rdot*(1-cos(side*angle));
+    r.z=r.z*cos(side*angle)+rcross.z*sin(side*angle)+(u.z)*rdot*(1-cos(side*angle));
 
 
 
@@ -79,15 +79,13 @@ void RotateLU(int side)
      double udot=dotGun(r,u);
      struct point ucross=cross_gun(r,u);
 
-    l.x=l.x*cos(side*ang)+lcross.x*sin(side*ang)+(r.x)*ldot*(1-cos(side*ang));
-    l.y=l.y*cos(side*ang)+lcross.y*sin(side*ang)+(r.y)*ldot*(1-cos(side*ang));
-    l.z=l.z*cos(side*ang)+lcross.z*sin(side*ang)+(r.z)*ldot*(1-cos(side*ang));
+    l.x=l.x*cos(side*angle)+lcross.x*sin(side*angle)+(r.x)*ldot*(1-cos(side*angle));
+    l.y=l.y*cos(side*angle)+lcross.y*sin(side*angle)+(r.y)*ldot*(1-cos(side*angle));
+    l.z=l.z*cos(side*angle)+lcross.z*sin(side*angle)+(r.z)*ldot*(1-cos(side*angle));
 
-    u.x=u.x*cos(side*ang)+ucross.x*sin(side*ang)+(r.x)*udot*(1-cos(side*ang));
-    u.y=u.y*cos(side*ang)+ucross.y*sin(side*ang)+(r.y)*udot*(1-cos(side*ang));
-    u.z=u.z*cos(side*ang)+ucross.z*sin(side*ang)+(r.z)*udot*(1-cos(side*ang));
-
-
+    u.x=u.x*cos(side*angle)+ucross.x*sin(side*angle)+(r.x)*udot*(1-cos(side*angle));
+    u.y=u.y*cos(side*angle)+ucross.y*sin(side*angle)+(r.y)*udot*(1-cos(side*angle));
+    u.z=u.z*cos(side*angle)+ucross.z*sin(side*angle)+(r.z)*udot*(1-cos(side*angle));
 
 
 }
@@ -101,13 +99,13 @@ void RotateRU(int side)
      double udot=dotGun(l,u);
      struct point ucross=cross_gun(l,u);
 
-    r.x=r.x*cos(side*ang)+rcross.x*sin(side*ang)+(l.x)*rdot*(1-cos(side*ang));
-    r.y=r.y*cos(side*ang)+rcross.y*sin(side*ang)+(l.y)*rdot*(1-cos(side*ang));
-    r.z=r.z*cos(side*ang)+rcross.z*sin(side*ang)+(l.z)*rdot*(1-cos(side*ang));
+    r.x=r.x*cos(side*angle)+rcross.x*sin(side*angle)+(l.x)*rdot*(1-cos(side*angle));
+    r.y=r.y*cos(side*angle)+rcross.y*sin(side*angle)+(l.y)*rdot*(1-cos(side*angle));
+    r.z=r.z*cos(side*angle)+rcross.z*sin(side*angle)+(l.z)*rdot*(1-cos(side*angle));
 
-    u.x=u.x*cos(side*ang)+ucross.x*sin(side*ang)+(l.x)*udot*(1-cos(side*ang));
-    u.y=u.y*cos(side*ang)+ucross.y*sin(side*ang)+(l.y)*udot*(1-cos(side*ang));
-    u.z=u.z*cos(side*ang)+ucross.z*sin(side*ang)+(l.z)*udot*(1-cos(side*ang));
+    u.x=u.x*cos(side*angle)+ucross.x*sin(side*angle)+(l.x)*udot*(1-cos(side*angle));
+    u.y=u.y*cos(side*angle)+ucross.y*sin(side*angle)+(l.y)*udot*(1-cos(side*angle));
+    u.z=u.z*cos(side*angle)+ucross.z*sin(side*angle)+(l.z)*udot*(1-cos(side*angle));
 
 
 
@@ -159,14 +157,14 @@ void drawGrid()
 	}
 }
 
-void drawSquare(double a)
+void drawWall(double a)
 {
     //glColor3f(1.0,0.0,0.0);
 	glBegin(GL_QUADS);{
-		glVertex3f( a, a,2);
-		glVertex3f( a,-a,2);
-		glVertex3f(-a,-a,2);
-		glVertex3f(-a, a,2);
+		glVertex3f( a, wall_y,a);
+		glVertex3f( a,wall_y,-a);
+		glVertex3f(-a,wall_y,-a);
+		glVertex3f(-a,wall_y,a);
 	}glEnd();
 }
 
@@ -220,6 +218,7 @@ void drawCone(double radius,double height,int segments)
 			glVertex3f(points[i+1].x,points[i+1].y,0);
         }
         glEnd();
+
     }
 }
 
@@ -266,7 +265,7 @@ void drawSphere(double radius,int slices,int stacks)
 
 void drawSS()
 {
-    glColor3f(1,0,0);
+   /* glColor3f(1,0,0);
     drawSquare(20);
 
     glRotatef(angle,0,0,1);
@@ -290,6 +289,7 @@ void drawSS()
     glRotatef(4*angle,0,0,1);
     glColor3f(1,1,0);
     drawSquare(5);
+    */
 }
 
 void keyboardListener(unsigned char key, int x,int y){
@@ -436,13 +436,15 @@ void display(){
 	drawAxes();
 	drawGrid();
 
+
+
+	drawWall(wall_side);
     //glColor3f(1,0,0);
     //drawSquare(10);
 
-    drawSS();
+    //drawSS();
 
-    //drawCircle(30,24);
-
+    //drawCircle(30,24)
     //drawCone(20,50,24);
 
 	//drawSphere(30,24,20);
@@ -454,7 +456,7 @@ void display(){
 
 
 void animate(){
-	angle+=0.05;
+	//angle+=0.05;
 	//codes for any changes in Models, Camera
 	glutPostRedisplay();
 }
@@ -465,7 +467,10 @@ void init(){
 	drawaxes=1;
 	cameraHeight=150.0;
 	cameraAngle=1.0;
-	angle=0;
+	angle=0.02;
+
+	wall_side=200.0;
+	wall_y=200.0;
 
 	pos.x=100;
     pos.y=100;
