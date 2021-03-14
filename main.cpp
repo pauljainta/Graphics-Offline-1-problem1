@@ -15,8 +15,11 @@ int drawaxes;
 double angle;
 double wall_side;
 double wall_y;
-double sphere_radius;
+double sphere_radius,small_sphere_radius,barrel_height;
 int color;
+
+double whole_part_rotate,whole_part_except_leftHem_rotate;
+
 
 
 
@@ -90,6 +93,12 @@ void RotateLU(int side)
     u.z=u.z*cos(side*angle)+ucross.z*sin(side*angle)+(r.z)*udot*(1-cos(side*angle));
 
 
+}
+
+void animate(){
+//	angle+=0.05;
+	//codes for any changes in Models, Camera
+	glutPostRedisplay();
 }
 
 
@@ -175,12 +184,12 @@ void drawCircle(double radius,int segments)
 {
     int i;
     struct point points[100];
-    glColor3f(0.7,0.7,0.7);
+    //glColor3f(0.7,0.7,0.7);
     //generate points
     for(i=0;i<=segments;i++)
     {
-        points[i].x=radius*cos(((double)i/(double)segments)*2*pi);
-        points[i].y=radius*sin(((double)i/(double)segments)*2*pi);
+        points[i].x=-(radius*cos(((double)i/(double)segments)*pi/2))+radius*2;
+        points[i].y=(radius*sin(((double)i/(double)segments)*pi/2))+barrel_height;
     }
     //draw segments using generated points
     for(i=0;i<segments;i++)
@@ -191,6 +200,34 @@ void drawCircle(double radius,int segments)
 			glVertex3f(points[i+1].x,points[i+1].y,0);
         }
         glEnd();
+    }
+}
+
+void drawLastShape(double radius , int segments)
+{
+
+
+    double rotation_angle = 360/segments;
+
+    //glTranslatef(circle_x , circle_y , circle_z);
+    drawCircle(radius , 30);
+    //glTranslatef(-50 , circle_y , circle_z);
+
+    int i;
+    int color = 1;
+    double angle_rotating = 0.2;
+    for(i=0 ; i<segments ; i++)
+    {
+        color = 1 - color;
+        double current_angle = 0;
+        glColor3f(color , color , color);
+        while(current_angle <= rotation_angle)
+        {
+            glRotatef(angle_rotating , 0 , 1 , 0);
+            drawCircle(radius , 30);
+
+            current_angle += 0.2;
+        }
     }
 }
 
@@ -243,7 +280,7 @@ void drawLeftHemisphere(double radius,int slices,int stacks)
 		}
 	}
 
-	glRotatef(90,1,0,0);
+	//glRotatef(90,1,0,0);
 	//draw quads using generated points
 	for(i=0;i<stacks;i++)
 	{
@@ -271,7 +308,7 @@ void drawLeftHemisphere(double radius,int slices,int stacks)
 
 void drawRightHemisphere(double radius,int slices,int stacks)
 {
-    color=1;
+    color=0;
 
     struct point points[100][100];
 	int i,j;
@@ -288,7 +325,7 @@ void drawRightHemisphere(double radius,int slices,int stacks)
 			points[i][j].z=h;
 		}
 	}
-	glRotatef(90,0,0,1);
+	//glRotatef(right_sphere_rotate,0,0,1);
 	//draw quads using generated points
 	for(i=0;i<stacks;i++)
 	{
@@ -355,6 +392,43 @@ void drawSphere(double radius,int slices,int stacks)
 }
 
 
+void drawBarrel(double radius,double height,int slices)
+{
+
+    //double shade;
+    struct point points[100];
+
+    for(int i=0;i<=slices;i++)
+    {
+        points[i].x=radius*cos(((double)i/(double)slices)*2*pi);
+        points[i].z=radius*sin(((double)i/(double)slices)*2*pi);
+    }
+
+
+
+     color = 0;
+    for(int i=0;i<slices;i++)
+    {
+        glColor3f(color , color , color);
+
+        glBegin(GL_QUADS);
+        {
+			glVertex3f(points[i].x,0+radius,points[i].z);
+			glVertex3f(points[i+1].x,0+radius,points[i+1].z);
+			glVertex3f(points[i+1].x,height+radius,points[i+1].z);
+			glVertex3f(points[i].x,height+radius,points[i].z);
+        }
+        glEnd();
+        if(color==0) color=1;
+        else color=0;
+    }
+
+
+
+}
+
+
+
 void drawSS()
 {
    /* glColor3f(1,0,0);
@@ -405,6 +479,25 @@ void keyboardListener(unsigned char key, int x,int y){
 		case '6':
 		    RotateRU(-1);
 			break;
+		case 'a':
+//            right_sphere_rotate+=1;
+            break;
+        case 'q':
+            if(whole_part_rotate!=45)
+            whole_part_rotate+=1;
+            break;
+        case 'w':
+            if(whole_part_rotate!=-45)
+            whole_part_rotate-=1;
+            break;
+         case 'e':
+            if(whole_part_except_leftHem_rotate!=45)
+            whole_part_except_leftHem_rotate+=1;
+            break;
+        case 'r':
+            if(whole_part_except_leftHem_rotate!=-45)
+            whole_part_except_leftHem_rotate-=1;
+            break;
 
 		default:
 			break;
@@ -528,21 +621,58 @@ void display(){
 	drawAxes();
 	drawGrid();
 	drawWall(wall_side);
-	drawLeftHemisphere(sphere_radius,50,50);
-	drawRightHemisphere(sphere_radius,50,50);
+	glRotatef(whole_part_rotate , 0 , 0 , 1);
+
+	 glPushMatrix();
+    {
+        glRotatef(90,1,0,0);
+        drawLeftHemisphere(sphere_radius,80,80);
+
+    }
+    glPopMatrix();
+
+    glRotatef(whole_part_except_leftHem_rotate , 1 , 0 , 0);
+
+    glPushMatrix();
+    {
+        glRotatef(90,1,0,0);
+        drawRightHemisphere(sphere_radius,80,80);
+    }
+    glPopMatrix();
 
 
- //   glColor3f(0,0,0);
-	//drawWall(wall_side);
-    //glColor3f(1,0,0);
-    //drawSquare(10);
 
-    //drawSS();
+     glPushMatrix();
+    {
+        glTranslatef(0,sphere_radius,0);
 
-    //drawCircle(30,24)
-    //drawCone(20,50,24);
+        glRotatef(90,1,0,0);
+        glTranslatef(0,0,-small_sphere_radius);
+        drawLeftHemisphere(small_sphere_radius,80,80);
 
-	//drawSphere(30,24,20);
+    }
+    glPopMatrix();
+
+     glPushMatrix();
+    {
+
+        glTranslatef(0,sphere_radius,0);
+        drawBarrel(small_sphere_radius,barrel_height,40);
+    }
+    glPopMatrix();
+
+     glPushMatrix();
+    {
+
+        glTranslatef(0,sphere_radius+small_sphere_radius,0);
+        drawLastShape(small_sphere_radius,40);
+    }
+    glPopMatrix();
+
+
+
+
+
 
 
 	//ADD this line in the end --- if you use double buffer (i.e. GL_DOUBLE)
@@ -550,11 +680,6 @@ void display(){
 }
 
 
-void animate(){
-	//angle+=0.05;
-	//codes for any changes in Models, Camera
-	glutPostRedisplay();
-}
 
 void init(){
 	//codes for initialization
@@ -566,8 +691,15 @@ void init(){
 
 	wall_side=200.0;
 	wall_y=200.0;
-	sphere_radius=30.0;
+	sphere_radius=40.0;
+	small_sphere_radius=10.0;
+	barrel_height=100.0;
 	color=1;
+//	right_sphere_rotate=90;
+	whole_part_rotate=0;
+
+
+	whole_part_except_leftHem_rotate=0;
 
 
 	pos.x=100;
@@ -619,8 +751,9 @@ int main(int argc, char **argv){
 
 	glEnable(GL_DEPTH_TEST);	//enable Depth Testing
 
-	glutDisplayFunc(display);	//display callback function
-	glutIdleFunc(animate);		//what you want to do in the idle time (when no drawing is occuring)
+	glutDisplayFunc(display);
+	glutIdleFunc(animate);	//display callback function
+             		//what you want to do in the idle time (when no drawing is occuring)
 
 	glutKeyboardFunc(keyboardListener);
 	glutSpecialFunc(specialKeyListener);
