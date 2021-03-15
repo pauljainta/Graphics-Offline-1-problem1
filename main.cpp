@@ -169,6 +169,9 @@ void drawGrid()
 	}
 }
 
+
+
+
 void drawWall(double a)
 {
 
@@ -423,7 +426,12 @@ void drawBarrel(double radius,double height,int slices)
 
 }
 
+void fire()
+{
 
+
+
+}
 
 void drawSS()
 {
@@ -575,8 +583,10 @@ void specialKeyListener(int key, int x,int y){
 void mouseListener(int button, int state, int x, int y){	//x, y is the x-y of the screen (2D)
 	switch(button){
 		case GLUT_LEFT_BUTTON:
-			if(state == GLUT_DOWN){		// 2 times?? in ONE click? -- solution is checking DOWN or UP
-				drawaxes=1-drawaxes;
+			if(state == GLUT_DOWN){
+                        // 2 times?? in ONE click? -- solution is checking DOWN or UP
+				//drawaxes=1-drawaxes;
+                 fire();
 			}
 			break;
 
@@ -680,8 +690,6 @@ void display(){
 
         glTranslatef(0,sphere_radius+small_sphere_radius,0);
 
-
-        drawCircle(sphere_radius , 40);
         drawRest(small_sphere_radius,40);
     }
     glPopMatrix();
