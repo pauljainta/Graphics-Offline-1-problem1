@@ -17,8 +17,9 @@ double wall_side;
 double wall_y;
 double sphere_radius,small_sphere_radius,barrel_height;
 int color;
+double deg;
 
-double whole_part_rotate,whole_part_except_leftHem_rotate;
+double whole_part_rotate,whole_part_except_leftHem_rotate,barrel_rotator_1,barrel_rotator_2;
 
 
 
@@ -170,7 +171,7 @@ void drawGrid()
 
 void drawWall(double a)
 {
-    //glColor3f(1.0,0.0,0.0);
+
 	glBegin(GL_QUADS);{
 		glVertex3f( a, wall_y,a);
 		glVertex3f( a,wall_y,-a);
@@ -184,8 +185,7 @@ void drawCircle(double radius,int segments)
 {
     int i;
     struct point points[100];
-    //glColor3f(0.7,0.7,0.7);
-    //generate points
+
     for(i=0;i<=segments;i++)
     {
         points[i].x=-(radius*cos(((double)i/(double)segments)*pi/2))+radius*2;
@@ -203,31 +203,27 @@ void drawCircle(double radius,int segments)
     }
 }
 
-void drawLastShape(double radius , int segments)
+void drawRest(double radius , int segments)
 {
 
 
-    double rotation_angle = 360/segments;
 
-    //glTranslatef(circle_x , circle_y , circle_z);
-    drawCircle(radius , 30);
-    //glTranslatef(-50 , circle_y , circle_z);
+     color = 0;
 
-    int i;
-    int color = 1;
-    double angle_rotating = 0.2;
-    for(i=0 ; i<segments ; i++)
+    for(int i=0 ; i<segments ; i++)
     {
-        color = 1 - color;
-        double current_angle = 0;
         glColor3f(color , color , color);
-        while(current_angle <= rotation_angle)
-        {
-            glRotatef(angle_rotating , 0 , 1 , 0);
-            drawCircle(radius , 30);
 
-            current_angle += 0.2;
+
+        for(double j=0;j<360/segments;j=j+0.1)
+        {
+            glRotatef(0.1,0,1,0);
+            drawCircle(radius,segments);
+
         }
+
+        if(color==0) color=1;
+        else color=0;
     }
 }
 
@@ -480,8 +476,24 @@ void keyboardListener(unsigned char key, int x,int y){
 		    RotateRU(-1);
 			break;
 		case 'a':
-//            right_sphere_rotate+=1;
+		    if(barrel_rotator_1!=12)
+                barrel_rotator_1+=1;
             break;
+        case 's':
+		    if(barrel_rotator_1!=-12)
+                barrel_rotator_1-=1;
+            break;
+
+        case 'd':
+		    if(barrel_rotator_2!=-45)
+                barrel_rotator_2-=1;
+            break;
+
+         case 'f':
+		    if(barrel_rotator_2!=45)
+                barrel_rotator_2+=1;
+            break;
+
         case 'q':
             if(whole_part_rotate!=45)
             whole_part_rotate+=1;
@@ -641,6 +653,8 @@ void display(){
     glPopMatrix();
 
 
+    glRotatef(barrel_rotator_1 , 1 , 0 , 0);
+    glRotatef(barrel_rotator_2 , 0 , 1 , 0);
 
      glPushMatrix();
     {
@@ -665,7 +679,10 @@ void display(){
     {
 
         glTranslatef(0,sphere_radius+small_sphere_radius,0);
-        drawLastShape(small_sphere_radius,40);
+
+
+        drawCircle(sphere_radius , 40);
+        drawRest(small_sphere_radius,40);
     }
     glPopMatrix();
 
@@ -690,8 +707,8 @@ void init(){
 	angle=0.02;
 
 	wall_side=200.0;
-	wall_y=200.0;
-	sphere_radius=40.0;
+	wall_y=300.0;
+	sphere_radius=30.0;
 	small_sphere_radius=10.0;
 	barrel_height=100.0;
 	color=1;
@@ -700,6 +717,8 @@ void init(){
 
 
 	whole_part_except_leftHem_rotate=0;
+	barrel_rotator_1=0;
+	barrel_rotator_2=0;
 
 
 	pos.x=100;
