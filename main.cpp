@@ -1,13 +1,15 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
-
+#include<iostream>
+#include<vector>
 
 #include <windows.h>
 #include <GL/glut.h>
 
 #define pi (2*acos(0.0))
 
+using namespace std;
 double cameraHeight;
 double cameraAngle;
 int drawgrid;
@@ -18,9 +20,9 @@ double wall_y;
 double sphere_radius,small_sphere_radius,barrel_height;
 int color;
 double deg;
-
+double rbullet_color,gbullet_color,bbullet_color;
 double whole_part_rotate,whole_part_except_leftHem_rotate,barrel_rotator_1,barrel_rotator_2;
-
+int check=0;
 
 
 
@@ -29,9 +31,20 @@ struct point
 	double x,y,z;
 };
 
+struct gun_point
+{
+    double x,y,z,w;
+
+};
+
 
 struct point pos,u,l,r;
 
+
+struct point vec;
+
+struct gun_point v;
+vector<gun_point> guns_and_glory;
 
 
 struct point cross_gun(struct point p1,struct point p2)
@@ -96,9 +109,10 @@ void RotateLU(int side)
 
 }
 
+
 void animate(){
-//	angle+=0.05;
-	//codes for any changes in Models, Camera
+
+
 	glutPostRedisplay();
 }
 
@@ -426,10 +440,35 @@ void drawBarrel(double radius,double height,int slices)
 
 }
 
-void fire()
+
+void fire(vector<gun_point> v)
 {
 
+  double a=small_sphere_radius/4;
 
+  for (auto i = v.begin(); i != v.end(); ++i){
+       struct gun_point g=*i;
+
+ glPushMatrix();
+  {
+    glRotatef(g.x , 0 , 0 , 1);
+    glRotatef(g.y , 1 , 0 , 0);
+    glTranslatef(vec.x,vec.y,vec.z);
+    glRotatef(g.z , 1 , 0 , 0);
+    glRotatef(g.w , 0 , 1 , 0);
+
+     glColor3f(1,0,0);
+   glBegin(GL_QUADS);
+   {
+		glVertex3f( a, 0,a);
+		glVertex3f( a,0,-a);
+		glVertex3f(-a,0,-a);
+		glVertex3f(-a,0,a);
+	}
+    glEnd();
+  }
+   glPopMatrix();
+  }
 
 }
 
@@ -485,38 +524,52 @@ void keyboardListener(unsigned char key, int x,int y){
 			break;
 		case 'a':
 		    if(barrel_rotator_1!=12)
+            {
                 barrel_rotator_1+=1;
+
+
+            }
+
             break;
         case 's':
-		    if(barrel_rotator_1!=-12)
+		    if(barrel_rotator_1!=-12){
                 barrel_rotator_1-=1;
+		    }
             break;
 
         case 'd':
-		    if(barrel_rotator_2!=-45)
+		    if(barrel_rotator_2!=-45){
                 barrel_rotator_2-=1;
+		    }
             break;
 
          case 'f':
-		    if(barrel_rotator_2!=45)
+		    if(barrel_rotator_2!=45){
                 barrel_rotator_2+=1;
+		    }
             break;
 
         case 'q':
-            if(whole_part_rotate!=45)
+            if(whole_part_rotate!=45){
             whole_part_rotate+=1;
+
+            }
             break;
         case 'w':
-            if(whole_part_rotate!=-45)
+            if(whole_part_rotate!=-45){
             whole_part_rotate-=1;
+            }
             break;
          case 'e':
-            if(whole_part_except_leftHem_rotate!=45)
+            if(whole_part_except_leftHem_rotate!=45){
             whole_part_except_leftHem_rotate+=1;
+            }
             break;
         case 'r':
-            if(whole_part_except_leftHem_rotate!=-45)
+            if(whole_part_except_leftHem_rotate!=-45){
             whole_part_except_leftHem_rotate-=1;
+
+            }
             break;
 
 		default:
@@ -584,9 +637,13 @@ void mouseListener(int button, int state, int x, int y){	//x, y is the x-y of th
 	switch(button){
 		case GLUT_LEFT_BUTTON:
 			if(state == GLUT_DOWN){
-                        // 2 times?? in ONE click? -- solution is checking DOWN or UP
-				//drawaxes=1-drawaxes;
-                 fire();
+                    printf("%f %f %f\n",vec.x,vec.y,vec.z);
+                    v.x=whole_part_rotate;
+                    v.y=whole_part_except_leftHem_rotate;
+                    v.z=barrel_rotator_1;
+                    v.w=barrel_rotator_2;
+            guns_and_glory.push_back(v);
+
 			}
 			break;
 
@@ -642,6 +699,11 @@ void display(){
 
 	drawAxes();
 	drawGrid();
+
+    fire(guns_and_glory);
+
+
+	glColor3f(0.6,0.6,0.6);
 	drawWall(wall_side);
 	glRotatef(whole_part_rotate , 0 , 0 , 1);
 
@@ -695,6 +757,19 @@ void display(){
     glPopMatrix();
 
 
+   /*glPushMatrix();
+    {
+    glTranslatef(vec.x,vec.y,vec.z);
+
+    }*/
+  //  glPopMatrix();
+
+    //glColor3f(rbullet_color,gbullet_color,bbullet_color);
+	//fire();
+
+
+
+
 
 
 
@@ -720,6 +795,7 @@ void init(){
 	small_sphere_radius=10.0;
 	barrel_height=100.0;
 	color=1;
+	rbullet_color=gbullet_color=bbullet_color=0.6;
 //	right_sphere_rotate=90;
 	whole_part_rotate=0;
 
@@ -744,6 +820,12 @@ void init(){
     r.x=(-1)/sqrt(2);
     r.y=(1)/sqrt(2);
     r.z=0;
+
+    vec.x=sphere_radius/4;
+    vec.y=wall_side+30;
+    vec.z=sphere_radius/4;
+
+
 
 
 	//clear the screen
@@ -773,7 +855,6 @@ int main(int argc, char **argv){
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);	//Depth, Double buffer, RGB color
 
 	glutCreateWindow("My OpenGL Program");
-
 	init();
 
 	glEnable(GL_DEPTH_TEST);	//enable Depth Testing
