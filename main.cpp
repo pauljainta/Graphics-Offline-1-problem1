@@ -426,8 +426,8 @@ void drawBarrel(double radius,double height,int slices)
 
         glBegin(GL_QUADS);
         {
-			glVertex3f(points[i].x,0+radius,points[i].z);
-			glVertex3f(points[i+1].x,0+radius,points[i+1].z);
+			glVertex3f(points[i].x,radius,points[i].z);
+			glVertex3f(points[i+1].x,radius,points[i+1].z);
 			glVertex3f(points[i+1].x,height+radius,points[i+1].z);
 			glVertex3f(points[i].x,height+radius,points[i].z);
         }
